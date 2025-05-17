@@ -21,15 +21,25 @@ class ImageSettingsWindow(Toplevel):
         rdo_middle_qual.pack(side="left")
         rdo_low_qual.pack(side="left")
 
-        self.sel_png_button = Button(self, text="PNG",command=self.on_click_select_format)
-        self.sel_png_button.pack(side="right")
-        self.sel_jpg_button = Button(self, text="JPG",command=self.on_click_select_format)
+        self.selbtn = "JPG" # 선택된 버튼 저장 하는 변수
+
+        self.sel_jpg_button = Button(self, text="JPG", command=self.on_click_select_format)
+        self.sel_jpg_button.bind("<Button-1>", self.set_selected_jpg)
         self.sel_jpg_button.pack(side="right")
+
+        self.sel_png_button = Button(self, text="PNG",command=self.on_click_select_format)
+        self.sel_png_button.bind("<Button-1>",self.set_selected_png) #이벤트 바인딩을 통해 기능 추가
+        self.sel_png_button.pack(side="right")
 
         self.wait_window(self)
 
-    def on_click_select_format(self):
-        filename =self.img_process.savefile("PNG")
-        print(filename)
-        ## 파일 저장하는 부분 추가!
+    def on_click_select_format(self): #최종 포맷 선택 버튼 클릭
+        self.img_process.savefile(img_format=self.selbtn, qul=self.qual_var.get())
         self.destroy()
+
+    # 선택된 버튼 변수 업데이트.  (너무 비 효울적)
+    def set_selected_png(self, event):
+        self.selbtn = "PNG"
+
+    def set_selected_jpg(self, event):
+        self.selbtn = "JPG"
