@@ -1,11 +1,12 @@
-from tkinter import  Tk,filedialog,Label,PhotoImage,Frame,Button,Toplevel,Radiobutton,StringVar
+from tkinter import  Label,Button,Toplevel,Radiobutton,StringVar
 
-import work.utils.file as File
+from work.utils.image_process import ImageProcess
 class ImageSettingsWindow(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("이미지 저장 설정")
         self.geometry("300x100+200+250")
+        self.img_process = ImageProcess()
         self.grab_set()
         self.qual_var = StringVar(value="high")
         rdo_high_qual = Radiobutton(self, text="최고", value="high",variable=self.qual_var)
@@ -28,7 +29,7 @@ class ImageSettingsWindow(Toplevel):
         self.wait_window(self)
 
     def on_click_select_format(self):
-        filename = File.savefile("PNG")
+        filename =self.img_process.savefile("PNG")
         print(filename)
         ## 파일 저장하는 부분 추가!
         self.destroy()
