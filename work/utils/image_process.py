@@ -28,17 +28,16 @@ class ImageProcess:
         if qul == "high":
                 write_qul.append((cv2.IMWRITE_PNG_COMPRESSION,0)) if img_format == "PNG" else write_qul.append((cv2.IMWRITE_JPEG_QUALITY,100))
         elif qul == "normal":
-            qul.append((cv2.IMWRITE_PNG_COMPRESSION, 2)) if img_format == "PNG" \
-                else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 80))
+            write_qul.append((cv2.IMWRITE_PNG_COMPRESSION, 2)) if img_format == "PNG" else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 80))
         elif qul == "middle":
-            write_qul.append((cv2.IMWRITE_PNG_COMPRESSION, 4)) if img_format == "PNG" \
-                else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 60))
-        else: qul.append((cv2.IMWRITE_PNG_COMPRESSION, 7)) if img_format == "PNG" \
-                else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 30))
+            write_qul.append((cv2.IMWRITE_PNG_COMPRESSION, 4)) if img_format == "PNG" else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 60))
+        elif qul == "low": write_qul.append((cv2.IMWRITE_PNG_COMPRESSION, 8)) if img_format == "PNG" else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 30))
 
         # 확장자 여부 확인 및 추가
         filename = filedialog.asksaveasfilename( title="Save Image", filetypes=file_types)
         if not(filename[-4:] == ".png" or filename[-4:] == ".jpg"):
             filename = filename + ".png" if img_format == "PNG" else filename + "jpg"
         # 파일 저장
-        cv2.imwrite(filename=filename,img=ImageProcess.image,params=write_qul[0])
+        if ImageProcess.image is not None:
+            cv2.imwrite(filename=filename,img=ImageProcess.image,params=write_qul[0])
+
