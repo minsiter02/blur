@@ -14,6 +14,6 @@ class TaskFrame(Frame):
 
     def on_click_open_button(self):  # 클릭 함수 이미지를 교체 함.
         image = self.img_process.openfile()
-        self.task_label.image =  image
-        self.task_label.config(image=image)
-        self.main.update_preview_frame(img=image) #main 을 거쳐 preview_frame 이미지를 업데이트
+        # main 을 거쳐 preview_frame 이미지를 업데이트
+        self.main.update_task_frame(img=image)
+        self.main.update_preview_frame(img=image)

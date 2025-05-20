@@ -7,6 +7,7 @@ class ImageSettingsWindow(Toplevel):
         self.title("이미지 저장 설정")
         self.geometry("300x100+200+250")
         self.img_process = ImageProcess()
+        self.resizable(False,False)
         self.grab_set()
         self.qual_var = StringVar(value="high")
         rdo_high_qual = Radiobutton(self, text="최고", value="high",variable=self.qual_var)

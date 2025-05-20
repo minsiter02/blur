@@ -27,8 +27,11 @@ class MainWindow(Tk):
         ####################### end_define frame #################
 
     def update_preview_frame(self,img):
-        self.preview_frame.task_label.image = img
-        self.preview_frame.task_label.config(image=img)
+        self.preview_frame.preview_label.image = img
+        self.preview_frame.preview_label.config(image=img)
+    def update_task_frame(self,img):
+        self.task_frame.task_label.image = img
+        self.task_frame.task_label.config(image=img)
 main = MainWindow()
 main.mainloop()
 

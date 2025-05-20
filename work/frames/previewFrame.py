@@ -9,8 +9,8 @@ class PreviewFrame(Frame):
 
         self.img_process = ImageProcess()
 
-        self.task_label = Label(self)
-        self.task_label.pack()
+        self.preview_label = Label(self)
+        self.preview_label.pack()
 
     def on_click_download_button(self):
         ImageSettingsWindow(self)

@@ -33,7 +33,7 @@ class ImageProcess:
             write_qul.append((cv2.IMWRITE_PNG_COMPRESSION, 4)) if img_format == "PNG" else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 60))
         elif qul == "low": write_qul.append((cv2.IMWRITE_PNG_COMPRESSION, 8)) if img_format == "PNG" else write_qul.append((cv2.IMWRITE_JPEG_QUALITY, 30))
 
-        # 확장자 여부 확인 및 추가
+        # 저장시 파일명 확장자 여부 확인 및 추가
         filename = filedialog.asksaveasfilename( title="Save Image", filetypes=file_types)
         if not(filename[-4:] == ".png" or filename[-4:] == ".jpg"):
             filename = filename + ".png" if img_format == "PNG" else filename + "jpg"
