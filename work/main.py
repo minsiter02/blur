@@ -26,12 +26,19 @@ class MainWindow(Tk):
         self.preview_frame.pack_propagate(False) # 크기고정
         ####################### end_define frame #################
 
-    def update_preview_frame(self,img):
-        self.preview_frame.preview_label.image = img
-        self.preview_frame.preview_label.config(image=img)
-    def update_task_frame(self,img):
-        self.task_frame.task_label.image = img
-        self.task_frame.task_label.config(image=img)
+    def update_task_view(self,img):
+        self.task_frame.task_canvas.config(width=300,height=450)
+        self.task_frame.task_canvas.create_image(150,225,image=img)
+        self.task_frame.task_canvas.image_names=img
+
+    def update_preview(self, img):
+        self.preview_frame.pre_canvas.config(width=300, height=450)
+        self.preview_frame.pre_canvas.create_image(150, 225, image=img)
+        self.preview_frame.pre_canvas.image_names = img
+
+    #중복되는 파라미터 관리 필요. 너무 많아짐
+    #image_process 분리필요. 쓰기 읽기 파일 메소드 분리
+
 main = MainWindow()
 main.mainloop()
 
