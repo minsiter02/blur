@@ -27,13 +27,19 @@ class MainWindow(Tk):
         ####################### end_define frame #################
 
     def update_task_view(self,img):
-        self.task_frame.task_canvas.config(width=300,height=450)
-        self.task_frame.task_canvas.create_image(150,225,image=img)
+        img_width = img.width()
+        img_height = img.height()
+        print(img_height, img_width)
+        self.task_frame.task_canvas.config(width=img_width, height=img_height)
+        self.task_frame.task_canvas.create_image(img_width/2, img_height/2, image=img)
         self.task_frame.task_canvas.image_names=img
 
     def update_preview(self, img):
-        self.preview_frame.pre_canvas.config(width=300, height=450)
-        self.preview_frame.pre_canvas.create_image(150, 225, image=img)
+        img_width = img.width()
+        img_height = img.height()
+        print(img_height,img_width)
+        self.preview_frame.pre_canvas.config(width=img_width, height=img_height)
+        self.preview_frame.pre_canvas.create_image(img_width/2, img_height/2, image=img)
         self.preview_frame.pre_canvas.image_names = img
 
     #중복되는 파라미터 관리 필요. 너무 많아짐

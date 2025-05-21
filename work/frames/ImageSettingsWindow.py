@@ -1,12 +1,11 @@
 from tkinter import  Label,Button,Toplevel,Radiobutton,StringVar
+from work.utils.file import savefile
 
-from work.utils.image_process import ImageProcess
 class ImageSettingsWindow(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("이미지 저장 설정")
         self.geometry("300x100+200+250")
-        self.img_process = ImageProcess()
         self.resizable(False,False)
         self.grab_set()
         self.qual_var = StringVar(value="high")
@@ -35,7 +34,7 @@ class ImageSettingsWindow(Toplevel):
         self.wait_window(self)
 
     def on_click_select_format(self): #최종 포맷 선택 버튼 클릭
-        self.img_process.savefile(img_format=self.selbtn, qul=self.qual_var.get())
+        savefile(img_format=self.selbtn, qul=self.qual_var.get())
         self.destroy()
 
     # 선택된 버튼 변수 업데이트.  (너무 비 효울적)

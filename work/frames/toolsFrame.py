@@ -1,4 +1,5 @@
 from tkinter import Frame,Button,Scale
+
 class ToolsFrame(Frame):
     def __init__(self, parent):
         super().__init__(parent, bg="blue",height=100)
