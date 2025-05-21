@@ -9,7 +9,7 @@ class MainWindow(Tk):
         super().__init__()
         self.title("test")
         self.geometry("800x600+100+100")
-        #self.resizable(False, False)  # 윈도우 크기 고정
+        self.resizable(False, False)  # 윈도우 크기 고정
         ###################### define frame ######################
         tools_frame = ToolsFrame(self)
         tools_frame.pack(side="bottom", expand=True, fill="both")
@@ -29,7 +29,6 @@ class MainWindow(Tk):
     def update_task_view(self,img):
         img_width = img.width()
         img_height = img.height()
-        print(img_height, img_width)
         self.task_frame.task_canvas.config(width=img_width, height=img_height)
         self.task_frame.task_canvas.create_image(img_width/2, img_height/2, image=img)
         self.task_frame.task_canvas.image_names=img
@@ -37,7 +36,6 @@ class MainWindow(Tk):
     def update_preview(self, img):
         img_width = img.width()
         img_height = img.height()
-        print(img_height,img_width)
         self.preview_frame.pre_canvas.config(width=img_width, height=img_height)
         self.preview_frame.pre_canvas.create_image(img_width/2, img_height/2, image=img)
         self.preview_frame.pre_canvas.image_names = img
