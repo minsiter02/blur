@@ -39,10 +39,10 @@ def savefile(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 �
     # 저장시 파일명 확장자 여부 확인 및 추가
     filepath = filedialog.asksaveasfilename(title="Save Image", filetypes=file_types)
     if not (filepath[-4:] == ".png" or filepath[-4:] == ".jpg"):
-        filepath = filepath + ".png" if img_format == "PNG" else filepath + "jpg"
+        filepath = filepath + ".png" if img_format == "PNG" else filepath + ".jpg"
 
     # 파일 저장
-    if ImageProcess.image is None or filepath == ".png" == filepath != ".jpg":
+    if ImageProcess.image is None or (filepath == ".png" or filepath == ".jpg"):
         pass  # None이거나 경로가 비었을 경우 안 함.
     else:
         cv2.imwrite(filename=filepath, img=ImageProcess.image, params=write_qul[0])

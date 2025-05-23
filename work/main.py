@@ -30,7 +30,7 @@ class MainWindow(Tk):
         img_width = img.width()
         img_height = img.height()
         self.task_frame.task_canvas.config(width=img_width, height=img_height)
-        self.task_frame.task_canvas.create_image(img_width/2, img_height/2, image=img)
+        self.task_frame.task_canvas.create_image( img_width/2, img_height/2, image=img)
         self.task_frame.task_canvas.image_names=img
 
     def update_preview(self, img):

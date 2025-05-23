@@ -7,7 +7,7 @@ class PreviewFrame(Frame):
         download_button = Button(self, text="download", command=self.on_click_download_button)
         download_button.pack(pady=5)
 
-        self.pre_canvas = Canvas(self, width=0, height=0)
+        self.pre_canvas = Canvas(self, width=0, height=0,highlightthickness=0)
         self.pre_canvas.place(relx=0.5, rely=0.5, anchor="center")
 
     def on_click_download_button(self):
