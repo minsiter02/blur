@@ -1,5 +1,5 @@
 from tkinter import  Label,Button,Toplevel,Radiobutton,StringVar
-from work.utils.file import save_image
+from work.utils.file import savefile
 
 class ImageSettingsWindow(Toplevel):
     def __init__(self, parent):
@@ -34,7 +34,7 @@ class ImageSettingsWindow(Toplevel):
         self.wait_window(self)
 
     def on_click_select_format(self): #최종 포맷 선택 버튼 클릭
-        save_image(img_format=self.selbtn, qul=self.qual_var.get())
+        savefile(img_format=self.selbtn, qul=self.qual_var.get())
         self.destroy()
 
     # 선택된 버튼 변수 업데이트.  (너무 비 효울적)
