@@ -41,7 +41,6 @@ class MainWindow(Tk):
         self.preview_frame.pre_canvas.image_names = img
 
     #중복되는 파라미터 관리 필요. 너무 많아짐
-    #image_process 분리필요. 쓰기 읽기 파일 메소드 분리
 
 main = MainWindow()
 main.mainloop()

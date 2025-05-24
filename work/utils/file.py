@@ -3,18 +3,16 @@ import cv2
 from PIL import Image,ImageTk
 from  work.utils.image_process import ImageProcess,image_resize
 
-def openfile(): #파일 열고, tk 형태로 변환.
+def open_image(): #파일 열고, tk 형태로 변환. + resize
     filepath = filedialog.askopenfilename( title="Select file",
         filetypes=(('Image files', '*.jpg *.png'), ('All files', '*.*')))
-    image = cv2.imread(filepath)
-    ImageProcess.image = image
-    resized_image = image_resize(img=image)
-    preview_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
-    preview_image = Image.fromarray(preview_image) #Numpy image to PIL image
-    preview_image = ImageTk.PhotoImage(image=preview_image) #PIL image to Tk image
-    return preview_image
+    if filepath == '':
+        return None # 이미지 로드를 최종적으로 로드 하지 않았을 경우 None
+    else:
+        image = cv2.imread(filepath)
+        return image
 
-def savefile(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 경로에 저장
+def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 경로에 저장
     file_types = []
     write_qul =[]
     if img_format == "PNG":
@@ -46,3 +44,11 @@ def savefile(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 �
         pass  # None이거나 경로가 비었을 경우 안 함.
     else:
         cv2.imwrite(filename=filepath, img=ImageProcess.image, params=write_qul[0])
+
+def return_resize_tkimg(image): #TK Canvas에 resize하여 표시하기 위해 리사이즈 까지 함.
+    ImageProcess.image = image
+    resized_image = image_resize(img=image)
+    pil_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
+    pil_image = Image.fromarray(pil_image)  # Numpy image to PIL image
+    tk_image= ImageTk.PhotoImage(image=pil_image)  # PIL image to Tk image
+    return tk_image
