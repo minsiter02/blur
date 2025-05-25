@@ -1,5 +1,6 @@
 from tkinter import filedialog
 import cv2
+import numpy as np
 from PIL import Image,ImageTk
 from  work.utils.image_process import ImageProcess,image_resize
 
@@ -9,7 +10,9 @@ def open_image(): #파일 열고, tk 형태로 변환. + resize
     if filepath == '':
         return None # 이미지 로드를 최종적으로 로드 하지 않았을 경우 None
     else:
-        image = cv2.imread(filepath)
+        #image = cv2.imread(filepath)
+        img_array = np.fromfile(filepath, np.uint8) # 이미지 불러오기 한글 경로 대응
+        image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
         return image
 
 def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 경로에 저장
@@ -43,7 +46,11 @@ def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 
     if ImageProcess.image is None or (filepath == ".png" or filepath == ".jpg"):
         pass  # None이거나 경로가 비었을 경우 안 함.
     else:
-        cv2.imwrite(filename=filepath, img=ImageProcess.image, params=write_qul[0])
+        #cv2.imwrite(filename=filepath, img=ImageProcess.image, params=write_qul[0])
+        success, buffer = cv2.imencode(filepath[-4:], ImageProcess.image) # 이미지 저장 한글 경로 대응
+        if success:
+            with open(filepath, mode= 'wb') as f_writer:
+                f_writer.write(buffer)
 
 def return_resize_tkimg(image): #TK Canvas에 resize하여 표시하기 위해 리사이즈 까지 함.
     ImageProcess.image = image

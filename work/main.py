@@ -8,7 +8,7 @@ class MainWindow(Tk):
     def __init__(self):
         super().__init__()
         self.title("test")
-        self.geometry("800x600+100+100")
+        self.geometry("800x560+100+100")
         self.resizable(False, False)  # 윈도우 크기 고정
         ###################### define frame ######################
         tools_frame = ToolsFrame(self)

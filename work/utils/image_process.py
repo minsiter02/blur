@@ -19,7 +19,7 @@ def image_resize(img):
         if img_y / img_scale > 450:  # 이미지가 너무 길면 세로를 기준으로 줄임.
             img_scale = img_y / 450.0
         img_x, img_y = int(round(img_x / img_scale, 3)), int(round(img_y / img_scale, 3))
-        ImageProcess.image_scale = int(round(img_scale, 3))  # class 변수 변경
+        ImageProcess.image_scale =round(img_scale, 3)  # class 변수 변경
         resized_img = cv2.resize(img, (img_x, img_y))
     return resized_img
 
@@ -27,9 +27,11 @@ def image_resize(img):
 def blur(coords, blur_config, intensity=121):
     blur_id, blur_shape = blur_config
     blur_img = ImageProcess.image
-    start_x, start_y, end_x, end_y = [c * ImageProcess.image_scale for c in coords]  # scale에 따른 좌표 보정
+    print(ImageProcess.image_scale)
+    start_x, start_y, end_x, end_y = [int(round(c * ImageProcess.image_scale)) for c in coords]  # scale에 따른 좌표 보정
     roi = blur_img[start_y:end_y, start_x:end_x]  # 관심영역만 가져오기. 행, 열
     roi_size = roi.shape[:2]  # 관심 영역의 너비, 높이 슬라이싱
+    print(start_x, start_y, end_x, end_y)
 
     t = intensity
     data = [1 / t for _ in range(t)]
