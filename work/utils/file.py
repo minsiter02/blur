@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image,ImageTk
 from  work.utils.image_process import ImageProcess,image_resize
 
-def open_image(): #파일 열고, tk 형태로 변환. + resize
+def open_image(): #파일 열기
     filepath = filedialog.askopenfilename( title="Select file",
         filetypes=(('Image files', '*.jpg *.png'), ('All files', '*.*')))
     if filepath == '':
@@ -13,6 +13,12 @@ def open_image(): #파일 열고, tk 형태로 변환. + resize
         #image = cv2.imread(filepath)
         img_array = np.fromfile(filepath, np.uint8) # 이미지 불러오기 한글 경로 대응
         image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+        ImageProcess.image = image
+        ImageProcess.img_history = []
+        ImageProcess.img_history = [[0,image]]
+        ImageProcess.img_history_id = 0
+        print(ImageProcess.img_history)
         return image
 
 def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 경로에 저장
@@ -53,7 +59,6 @@ def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 
                 f_writer.write(buffer)
 
 def return_resize_tkimg(image): #TK Canvas에 resize하여 표시하기 위해 리사이즈 까지 함.
-    ImageProcess.image = image
     resized_image = image_resize(img=image)
     pil_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
     pil_image = Image.fromarray(pil_image)  # Numpy image to PIL image

@@ -2,12 +2,11 @@ import math
 import cv2
 import numpy as np
 
-
 class ImageProcess:
     image = None
     image_scale = None
     img_history = []  # [ [id, image],[id, image], ... , [id, image] ]
-
+    img_history_id = -1
 
 def image_resize(img):
     img_x, img_y = img.shape[1], img.shape[0]
@@ -23,20 +22,31 @@ def image_resize(img):
         resized_img = cv2.resize(img, (img_x, img_y))
     return resized_img
 
+def redo_img():
+    cur_id = ImageProcess.img_history_id #현재 id
+    history = ImageProcess.img_history #
+    if cur_id == 0: #초기 이미지일때 지우기 안됨.
+        return None
+    else:# 파일구조가 조금 복잡해서 (시간순으로 정렬하려다 보니) id로 해당 index를 찾고, 그 전 index를 구하는 방식으로 구현
+        ids = [id_img[0] for id_img in history] #모든 ID를 가진 리스트
+        cur_id_pos = ids.index(cur_id) #현재 id의 위치
+        target_id_pos = cur_id_pos - 1 # 1칸 왼쪽의 위치
+        ImageProcess.image = history[target_id_pos][1] # 그 전 이미지 불러오기
+        ImageProcess.img_history_id = history[target_id_pos][0] # 그 전
+        return ImageProcess.image
 
-def blur(coords, blur_config, intensity=121):
+def blur(coords, blur_config, intensity=169):
     blur_id, blur_shape = blur_config
-    blur_img = ImageProcess.image
-    print(ImageProcess.image_scale)
+    blur_img = ImageProcess.image.copy() # 참조가 아닌 복사
     start_x, start_y, end_x, end_y = [int(round(c * ImageProcess.image_scale)) for c in coords]  # scale에 따른 좌표 보정
     roi = blur_img[start_y:end_y, start_x:end_x]  # 관심영역만 가져오기. 행, 열
     roi_size = roi.shape[:2]  # 관심 영역의 너비, 높이 슬라이싱
-    print(start_x, start_y, end_x, end_y)
 
     t = intensity
     data = [1 / t for _ in range(t)]
     blur_mask = np.array(data, np.float32).reshape(int(math.sqrt(t)), int(math.sqrt(t)))
     blur_roi = pixel_blur(roi, blur_mask)
+
     dst = []
 
     if blur_shape == "circle":
@@ -59,11 +69,17 @@ def blur(coords, blur_config, intensity=121):
     blur_img[start_y:end_y, start_x:end_x] = dst
     ImageProcess.image = blur_img
 
-    img_key_value = [blur_id, blur_img]  # 순차적으로 생긴 것 들을 접근하기 위해 리스트로 구현.
-    ImageProcess.img_history.append(img_key_value)
-    print(ImageProcess.img_history)
-    return blur_img
+    img_id_value = [blur_id, blur_img]
+    # 순차적으로 생긴 것 들을 접근하기 위해 리스트로 구현.
+    if ImageProcess.img_history_id == ImageProcess.img_history[-1][0]: #만약 마지막 원소의 id와 현재 이미지 id가 같다면
+        ImageProcess.img_history.append(img_id_value) # 그냥 맨 뒤에 id,이미지 정보 추가
+    else: # redo 기록이 있다면 (마지막 원소가 아니라면) redo 부분까지만 슬라이싱
+        ImageProcess.img_history = ImageProcess.img_history[:ImageProcess.img_history_id + 1]
+        ImageProcess.img_history.append(img_id_value) # redo 부분 이후로 지우고 거기다가 추가.
 
+    ImageProcess.img_history_id = ImageProcess.img_history[-1][0]
+
+    return blur_img
 
 def pixel_blur(image, mask):
     """

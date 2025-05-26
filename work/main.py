@@ -11,10 +11,9 @@ class MainWindow(Tk):
         self.geometry("800x560+100+100")
         self.resizable(False, False)  # 윈도우 크기 고정
         ###################### define frame ######################
-        tools_frame = ToolsFrame(self)
+        self.task_frame = TaskFrame(self, main=self)
+        tools_frame = ToolsFrame(self, main= self)
         tools_frame.pack(side="bottom", expand=True, fill="both")
-
-        self.task_frame = TaskFrame(self,main=self)
         self.task_frame.pack(side="left", expand=True, fill="both")
         self.task_frame.pack_propagate(False) # 크기고정
 
@@ -40,6 +39,11 @@ class MainWindow(Tk):
         self.preview_frame.pre_canvas.create_image(img_width/2, img_height/2, image=img)
         self.preview_frame.pre_canvas.image_names = img
 
+    def redo_task(self):
+        self.task_frame.delete_shape()
+
+    def undo(self):
+        pass
     #중복되는 파라미터 관리 필요. 너무 많아짐
 
 main = MainWindow()
