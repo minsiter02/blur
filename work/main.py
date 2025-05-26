@@ -40,10 +40,11 @@ class MainWindow(Tk):
         self.preview_frame.pre_canvas.image_names = img
 
     def redo_task(self):
-        self.task_frame.delete_shape()
+        self.task_frame.redo_shape()
 
-    def undo(self):
-        pass
+    def undo_task(self):
+        undo_id = self.task_frame.undo()
+        return undo_id
     #중복되는 파라미터 관리 필요. 너무 많아짐
 
 main = MainWindow()

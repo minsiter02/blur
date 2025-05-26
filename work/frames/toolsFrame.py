@@ -1,5 +1,5 @@
 from tkinter import Frame, Button, Scale, Radiobutton, IntVar
-from work.utils.image_process import redo_img
+from work.utils.image_process import redo_img,undo_img, update_undo_id
 from work.utils.file import return_resize_tkimg
 class ToolsFrame(Frame):
     def __init__(self, parent, main):
@@ -38,4 +38,12 @@ class ToolsFrame(Frame):
 
 
     def on_click_undo_btn(self):
-        print()
+        undo_image = undo_img()
+        if undo_image is None:
+            pass
+        else:
+            img = return_resize_tkimg(undo_image)
+            self.main.update_preview(img)
+            # 새로운 id를 넘겨줌.
+            undo_id = self.main.undo_task()
+            update_undo_id(undo_id)

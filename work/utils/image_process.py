@@ -27,13 +27,34 @@ def redo_img():
     history = ImageProcess.img_history #
     if cur_id == 0: #초기 이미지일때 지우기 안됨.
         return None
-    else:# 파일구조가 조금 복잡해서 (시간순으로 정렬하려다 보니) id로 해당 index를 찾고, 그 전 index를 구하는 방식으로 구현
+    else:# 파일구조가 조금 복잡해서 (시간 순으로 정렬 하려다 보니) id로 해당 index를 찾고, 그 전 index를 구하는 방식으로 구현
         ids = [id_img[0] for id_img in history] #모든 ID를 가진 리스트
         cur_id_pos = ids.index(cur_id) #현재 id의 위치
         target_id_pos = cur_id_pos - 1 # 1칸 왼쪽의 위치
         ImageProcess.image = history[target_id_pos][1] # 그 전 이미지 불러오기
         ImageProcess.img_history_id = history[target_id_pos][0] # 그 전
         return ImageProcess.image
+
+def undo_img():
+    cur_id = ImageProcess.img_history_id
+    history = ImageProcess.img_history
+    if cur_id == history[-1][0]:
+        return None
+    else:
+        ids = [id_img[0] for id_img in history]  # 모든 ID를 가진 리스트
+        cur_id_pos = ids.index(cur_id)  # 현재 id의 위치
+        target_id_pos = cur_id_pos + 1  # 1칸 오른쪽의 위치
+        ImageProcess.image = history[target_id_pos][1]
+        ImageProcess.img_history_id = history[target_id_pos][0]
+        return ImageProcess.image
+
+def update_undo_id(undo_id):
+    cur_id = ImageProcess.img_history_id
+    history = ImageProcess.img_history
+    ids = [id_img[0] for id_img in history]  # 모든 ID를 가진 리스트
+    cur_id_pos = ids.index(cur_id) # 현재 id의 위치를 찾고
+    ImageProcess.img_history[cur_id_pos][0] = undo_id # 기록에서 해당 위치에 새로운 id 업데이트
+    ImageProcess.img_history_id = undo_id # 현재 id를 업데이트
 
 def blur(coords, blur_config, intensity=169):
     blur_id, blur_shape = blur_config

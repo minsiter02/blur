@@ -22,7 +22,6 @@ class TaskFrame(Frame):
         self.task_canvas.bind("<ButtonRelease-1>", self.on_release)
 
         self.blur_config_history = [] #[ [id, [values]], [id, [values]], ... , [id, [values]] ] # values = [type, coords, fill_color]
-        self.task_canvas.bind("<Button-2>",self.redo)
         self.blur_conf_hist_id = -1
         self.kv_tmp = []
 
@@ -38,8 +37,7 @@ class TaskFrame(Frame):
             self.blur_conf_hist_id = 0
             self.blur_config_history =[[0,0]]
 
-
-    def delete_shape(self): # 임시 undo 함수.
+    def redo_shape(self): # 임시 undo 함수.
         cur_id = self.blur_conf_hist_id
         history = self.blur_config_history
         if cur_id == 0: #초기 이미지일때 지우기 안됨.
@@ -51,8 +49,27 @@ class TaskFrame(Frame):
             self.task_canvas.delete(history[cur_id_pos][0])  # 사각형 삭제
             self.blur_conf_hist_id = history[target_id_pos][0]  # 그 전 id를 현재 id
 
-    def redo(self, event):
-        pass
+    def undo(self):
+        cur_id = self.blur_conf_hist_id
+        history = self.blur_config_history
+        if cur_id == history[-1][0]:
+            pass
+        else: # 파일구조가 조금 복잡해서 (시간순으로 정렬하려다 보니) id로 해당 index를 찾고, 그 전 index를 구하는 방식으로 구현
+            ids = [id_shape[0] for id_shape in history]  # 모든 ID를 가진 리스트
+            cur_id_pos = ids.index(cur_id)  # 현재 id의 위치
+            target_id_pos = cur_id_pos + 1  # 1칸 왼쪽의 위치
+
+            tg_start_x, tg_start_y, tg_end_x, tg_end_y = history[target_id_pos][1][1]
+            tg_color = history[target_id_pos][1][2]
+
+            if history[target_id_pos][1][0] == "rect": # 기존 도형 구분
+                # 이미지와는 다르게 되돌리기 할 때마다 새로운 도형을 만들기 때문에 id가 바뀜.
+                self.blur_config_history[target_id_pos][0] = self.task_canvas.create_rectangle(tg_start_x,tg_start_y,tg_end_x,tg_end_y,fill=tg_color, outline="blue",width=2)
+            else:
+                self.blur_config_history[target_id_pos][0] = self.task_canvas.create_oval(tg_start_x, tg_start_y, tg_end_x, tg_end_y, fill=tg_color, outline="red", width=2)
+
+            self.blur_conf_hist_id = history[target_id_pos][0]  # 되돌리기 한 id를 현재 id로 업데이트
+        return self.blur_conf_hist_id # 새로운 id를 리턴.
 
     def on_press(self, event): #마우스를 처음 누룰 때 시작 좌표 설정
         self.start_x = event.x
