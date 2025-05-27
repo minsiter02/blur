@@ -1,5 +1,5 @@
 from tkinter import Frame, Button, Scale, Radiobutton, StringVar, IntVar
-from work.utils.image_process import redo_img,undo_img, update_undo_id
+from work.utils.image_process import redo_img,undo_img, update_redo_id
 from work.utils.file import return_resize_tkimg
 class ToolsFrame(Frame):
     def __init__(self, parent, main):
@@ -8,8 +8,8 @@ class ToolsFrame(Frame):
         top_frame = Frame(self,background="gray",pady= 5)
         top_frame.pack(side="top")
 
-        self.redo_button = Button(top_frame, text="Redo", command=self.on_click_redo_btn)
-        self.undo_button = Button(top_frame, text="Undo", command=self.on_click_undo_btn)
+        self.redo_button = Button(top_frame, text="Undo", command=self.on_click_undo_btn)
+        self.undo_button = Button(top_frame, text="Redo", command=self.on_click_redo_btn)
 
         self.redo_button.pack(side="left", padx=8)
         self.undo_button.pack(side="left", padx=8)
@@ -25,25 +25,21 @@ class ToolsFrame(Frame):
         self.scale = Scale(self,width=20, length=600, troughcolor="light gray",sliderlength=15 , relief="flat",sliderrelief="flat", variable=self.intensity_value,  orient="horizontal", showvalue=False, from_=3, to = 27, resolution= 2, command=self.change_intensity)
         self.scale.pack(side="right", padx=10)
 
+    def on_click_undo_btn(self): # 되돌리기 버튼
+        undo_image = undo_img() # 이미지 부터 받기
+        if undo_image is None: return None # 없으면 안 함
+        img = return_resize_tkimg(undo_image) # 리사이즈
+        self.main.update_preview(img) # 미리보기 업데이트
+        self.main.undo_task() # 도형 되돌리기
+
     def on_click_redo_btn(self):
         redo_image = redo_img()
-        if redo_image is None:
-            pass
-        else:
-            img = return_resize_tkimg(redo_image)
-            self.main.update_preview(img)
-            self.main.redo_task()
-
-    def on_click_undo_btn(self):
-        undo_image = undo_img()
-        if undo_image is None:
-            pass
-        else:
-            img = return_resize_tkimg(undo_image)
-            self.main.update_preview(img)
-            # 새로운 id를 넘겨줌.
-            undo_id = self.main.undo_task()
-            update_undo_id(undo_id)
+        if redo_image is None: return None
+        img = return_resize_tkimg(redo_image)
+        self.main.update_preview(img)
+        # 새로운 id를 넘겨줌.
+        redo_id = self.main.redo_task()
+        update_redo_id(redo_id)
 
     def on_rdo_btn(self):
         blur_set = [self.radio_var.get(), (self.intensity_value.get()**2)]
@@ -53,3 +49,4 @@ class ToolsFrame(Frame):
         print(event)
         blur_set = [self.radio_var.get(), (self.intensity_value.get()**2)]
         self.main.change_blur_settings(blur_set)
+

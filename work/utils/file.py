@@ -7,18 +7,16 @@ from  work.utils.image_process import ImageProcess,image_resize
 def open_image(): #파일 열기
     filepath = filedialog.askopenfilename( title="Select file",
         filetypes=(('Image files', '*.jpg *.png'), ('All files', '*.*')))
-    if filepath == '':
-        return None # 이미지 로드를 최종적으로 로드 하지 않았을 경우 None
-    else:
-        #image = cv2.imread(filepath)
-        img_array = np.fromfile(filepath, np.uint8) # 이미지 불러오기 한글 경로 대응
-        image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+    if filepath == '': return None # 이미지 로드를 최종적으로 로드 하지 않았을 경우 None
+    #image = cv2.imread(filepath)
+    img_array = np.fromfile(filepath, np.uint8) # 이미지 불러오기 한글 경로 대응
+    image = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
-        ImageProcess.image = image
-        ImageProcess.img_history = []
-        ImageProcess.img_history = [[0,image]]
-        ImageProcess.img_history_id = 0
-        return image
+    ImageProcess.image = image
+    ImageProcess.img_history = []
+    ImageProcess.img_history = [[0,image]]
+    ImageProcess.img_history_id = 0
+    return image
 
 def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 경로에 저장
     file_types = []
@@ -47,15 +45,13 @@ def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 
     if not (filepath[-4:] == ".png" or filepath[-4:] == ".jpg"):
         filepath = filepath + ".png" if img_format == "PNG" else filepath + ".jpg"
 
-    # 파일 저장
-    if ImageProcess.image is None or (filepath == ".png" or filepath == ".jpg"):
-        pass  # None이거나 경로가 비었을 경우 안 함.
-    else:
-        #cv2.imwrite(filename=filepath, img=ImageProcess.image, params=write_qul[0])
-        success, buffer = cv2.imencode(filepath[-4:], ImageProcess.image) # 이미지 저장 한글 경로 대응
-        if success:
-            with open(filepath, mode= 'wb') as f_writer:
-                f_writer.write(buffer)
+    # 파일 저장 # None이거나 경로가 비었을 경우 안 함.
+    if ImageProcess.image is None or (filepath == ".png" or filepath == ".jpg"): return None
+    #cv2.imwrite(filename=filepath, img=ImageProcess.image, params=write_qul[0])
+    success, buffer = cv2.imencode(filepath[-4:], ImageProcess.image) # 이미지 저장 한글 경로 대응
+    if success:
+        with open(filepath, mode= 'wb') as f_writer:
+            f_writer.write(buffer)
 
 def return_resize_tkimg(image): #TK Canvas에 resize하여 표시하기 위해 리사이즈 까지 함.
     resized_image = image_resize(img=image)

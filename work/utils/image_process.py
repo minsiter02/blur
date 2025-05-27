@@ -23,7 +23,7 @@ def image_resize(img):
         resized_img = cv2.resize(img, (img_x, img_y))
     return resized_img
 
-def redo_img():
+def undo_img():
     cur_id = ImageProcess.img_history_id #현재 id
     history = ImageProcess.img_history #
     if cur_id == 0 or cur_id == -1: #초기 이미지일때 지우기 안됨.
@@ -35,7 +35,7 @@ def redo_img():
         ImageProcess.img_history_id = history[target_id_pos][0] # 그 전
         return ImageProcess.image
 
-def undo_img():
+def redo_img():
     cur_id = ImageProcess.img_history_id
     history = ImageProcess.img_history
     if cur_id == -1 or cur_id == history[-1][0]:
@@ -47,10 +47,10 @@ def undo_img():
         ImageProcess.img_history_id = history[target_id_pos][0]
         return ImageProcess.image
 
-def update_undo_id(undo_id):
+def update_redo_id(redo_id):
     cur_id_pos = find_element_idx(ImageProcess.img_history_id,ImageProcess.img_history) # 현재 id의 위치를 찾고
-    ImageProcess.img_history[cur_id_pos][0] = undo_id # 기록에서 해당 위치에 새로운 id 업데이트
-    ImageProcess.img_history_id = undo_id # 현재 id를 업데이트
+    ImageProcess.img_history[cur_id_pos][0] = redo_id # 기록에서 해당 위치에 새로운 id 업데이트
+    ImageProcess.img_history_id = redo_id # 현재 id를 업데이트
 
 def blur(coords, blur_config):
     blur_id, blur_shape, intensity = blur_config
@@ -58,7 +58,6 @@ def blur(coords, blur_config):
     start_x, start_y, end_x, end_y = [int(round(c * ImageProcess.image_scale)) for c in coords]  # scale에 따른 좌표 보정
     roi = blur_img[start_y:end_y, start_x:end_x]  # 관심영역만 가져오기. 행, 열
     roi_size = roi.shape[:2]  # 관심 영역의 너비, 높이 슬라이싱
-
 
     data = [1 / intensity for _ in range(intensity)]
     blur_mask = np.array(data, np.float32).reshape(int(math.sqrt(intensity)), int(math.sqrt(intensity)))
