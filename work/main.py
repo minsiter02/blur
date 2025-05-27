@@ -43,9 +43,12 @@ class MainWindow(Tk):
         self.task_frame.redo_shape()
 
     def undo_task(self):
-        undo_id = self.task_frame.undo()
+        undo_id = self.task_frame.undo_shape()
         return undo_id
-    #중복되는 파라미터 관리 필요. 너무 많아짐
+    def change_blur_settings(self,blur_set):
+        shape, intensity = blur_set
+        self.task_frame.shape = shape
+        self.task_frame.intensity = intensity
 
 main = MainWindow()
 main.mainloop()

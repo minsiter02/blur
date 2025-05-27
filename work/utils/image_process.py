@@ -1,6 +1,7 @@
 import math
 import cv2
 import numpy as np
+from work.utils.tools import find_element_idx
 
 class ImageProcess:
     image = None
@@ -25,11 +26,10 @@ def image_resize(img):
 def redo_img():
     cur_id = ImageProcess.img_history_id #현재 id
     history = ImageProcess.img_history #
-    if cur_id == 0: #초기 이미지일때 지우기 안됨.
+    if cur_id == 0 or cur_id == -1: #초기 이미지일때 지우기 안됨.
         return None
     else:# 파일구조가 조금 복잡해서 (시간 순으로 정렬 하려다 보니) id로 해당 index를 찾고, 그 전 index를 구하는 방식으로 구현
-        ids = [id_img[0] for id_img in history] #모든 ID를 가진 리스트
-        cur_id_pos = ids.index(cur_id) #현재 id의 위치
+        cur_id_pos = find_element_idx(cur_id,history) #현재 id의 위치
         target_id_pos = cur_id_pos - 1 # 1칸 왼쪽의 위치
         ImageProcess.image = history[target_id_pos][1] # 그 전 이미지 불러오기
         ImageProcess.img_history_id = history[target_id_pos][0] # 그 전
@@ -38,34 +38,30 @@ def redo_img():
 def undo_img():
     cur_id = ImageProcess.img_history_id
     history = ImageProcess.img_history
-    if cur_id == history[-1][0]:
+    if cur_id == -1 or cur_id == history[-1][0]:
         return None
     else:
-        ids = [id_img[0] for id_img in history]  # 모든 ID를 가진 리스트
-        cur_id_pos = ids.index(cur_id)  # 현재 id의 위치
+        cur_id_pos = find_element_idx(cur_id,history) # 현재 id의 위치
         target_id_pos = cur_id_pos + 1  # 1칸 오른쪽의 위치
         ImageProcess.image = history[target_id_pos][1]
         ImageProcess.img_history_id = history[target_id_pos][0]
         return ImageProcess.image
 
 def update_undo_id(undo_id):
-    cur_id = ImageProcess.img_history_id
-    history = ImageProcess.img_history
-    ids = [id_img[0] for id_img in history]  # 모든 ID를 가진 리스트
-    cur_id_pos = ids.index(cur_id) # 현재 id의 위치를 찾고
+    cur_id_pos = find_element_idx(ImageProcess.img_history_id,ImageProcess.img_history) # 현재 id의 위치를 찾고
     ImageProcess.img_history[cur_id_pos][0] = undo_id # 기록에서 해당 위치에 새로운 id 업데이트
     ImageProcess.img_history_id = undo_id # 현재 id를 업데이트
 
-def blur(coords, blur_config, intensity=169):
-    blur_id, blur_shape = blur_config
+def blur(coords, blur_config):
+    blur_id, blur_shape, intensity = blur_config
     blur_img = ImageProcess.image.copy() # 참조가 아닌 복사
     start_x, start_y, end_x, end_y = [int(round(c * ImageProcess.image_scale)) for c in coords]  # scale에 따른 좌표 보정
     roi = blur_img[start_y:end_y, start_x:end_x]  # 관심영역만 가져오기. 행, 열
     roi_size = roi.shape[:2]  # 관심 영역의 너비, 높이 슬라이싱
 
-    t = intensity
-    data = [1 / t for _ in range(t)]
-    blur_mask = np.array(data, np.float32).reshape(int(math.sqrt(t)), int(math.sqrt(t)))
+
+    data = [1 / intensity for _ in range(intensity)]
+    blur_mask = np.array(data, np.float32).reshape(int(math.sqrt(intensity)), int(math.sqrt(intensity)))
     blur_roi = pixel_blur(roi, blur_mask)
 
     dst = []
@@ -94,8 +90,10 @@ def blur(coords, blur_config, intensity=169):
     # 순차적으로 생긴 것 들을 접근하기 위해 리스트로 구현.
     if ImageProcess.img_history_id == ImageProcess.img_history[-1][0]: #만약 마지막 원소의 id와 현재 이미지 id가 같다면
         ImageProcess.img_history.append(img_id_value) # 그냥 맨 뒤에 id,이미지 정보 추가
-    else: # redo 기록이 있다면 (마지막 원소가 아니라면) redo 부분까지만 슬라이싱
-        ImageProcess.img_history = ImageProcess.img_history[:ImageProcess.img_history_id + 1]
+    else:
+        # redo 기록이 있다면 (마지막 원소가 아니라면) redo 부분까지만 슬라이싱
+        cur_id_pos = find_element_idx(ImageProcess.img_history_id,ImageProcess.img_history)
+        ImageProcess.img_history = ImageProcess.img_history[:cur_id_pos + 1]
         ImageProcess.img_history.append(img_id_value) # redo 부분 이후로 지우고 거기다가 추가.
 
     ImageProcess.img_history_id = ImageProcess.img_history[-1][0]

@@ -18,7 +18,6 @@ def open_image(): #파일 열기
         ImageProcess.img_history = []
         ImageProcess.img_history = [[0,image]]
         ImageProcess.img_history_id = 0
-        print(ImageProcess.img_history)
         return image
 
 def save_image(img_format, qul): # 넘겨 받은 포맷, 퀄리티로 지정한 경로에 저장
