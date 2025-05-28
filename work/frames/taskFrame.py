@@ -76,6 +76,7 @@ class TaskFrame(Frame):
         self.shape_hist_id = history[target_id_pos][0]  # 되돌리기 한 id를 현재 id로 업데이트
         return self.shape_hist_id # 새로운 id를 리턴.
 
+
     def on_press(self, event): #마우스를 처음 누룰 때 시작 좌표 설정
         self.start_x = event.x
         self.start_y = event.y
@@ -95,15 +96,26 @@ class TaskFrame(Frame):
         event.x = max(1, min(event.x, self.task_canvas_width))
         event.y = max(1, min(event.y, self.task_canvas_height))
 
-        if self.press_shift: # Shift 누르고 있으면 도형은 대칭임.
-            if self.start_y > event.y:
-                self.end_y = self.start_y - abs(event.x - self.start_x)
-                self.task_canvas.coords(e_id, self.start_x, self.start_y, event.x, self.end_y)
+        self.end_x = max(1, min(event.x, self.task_canvas_width))
+        self.end_y = max(1, min(event.y, self.task_canvas_height))
+
+        if self.press_shift:  # Shift 키를 눌렀을 때 정사각형 유지
+            width = abs(self.end_x - self.start_x)
+            height = abs(self.end_y - self.start_y)
+            size = min(width, height)  # 가로, 세로 중 작은 값으로 크기 설정
+            if self.start_x > self.end_x: # x좌표
+                self.end_x = max(1, self.start_x - size)
             else:
-                self.end_y = self.start_y + abs(event.x - self.start_x)
-                self.task_canvas.coords(e_id, self.start_x, self.start_y, event.x, self.end_y)
-        else: # 안누르고 있으면 아님~
-            self.end_y = event.y
+                self.end_x = min(self.start_x + size, self.task_canvas_width)
+            # y좌표
+            if self.start_y > self.end_y:
+                self.end_y = max(1, self.start_y - size)
+            else:
+                self.end_y = min(self.start_y + size, self.task_canvas_height)
+            self.task_canvas.coords(e_id, self.start_x, self.start_y, self.end_x, self.end_y)
+
+        else: # Shift를 누르지 않은 경우
+            self.end_y = max(1, min(event.y, self.task_canvas_height))
             self.task_canvas.coords(e_id, self.start_x, self.start_y, event.x, self.end_y)
 
     def on_release(self, event): # 드래그 완료 후 도형 확정
@@ -111,8 +123,7 @@ class TaskFrame(Frame):
         if self.start_x == event.x or self.start_y == event.y: # 바로 놓을 경우 pass
             self.task_canvas.delete(self.kv_tmp[0])
             return None
-
-        #이전에 redo 여부 확인
+        # 이전에 redo 여부 확인
         if self.shape_hist_id == self.shape_history[-1][0]: # 없을 시 새로운 도형 정보 추가
             self.shape_history.append(self.kv_tmp)
         else: # 이전에 redo 있을시
@@ -120,8 +131,23 @@ class TaskFrame(Frame):
             self.shape_history = self.shape_history[:cur_id_pos + 1] # redo 한 부분까지만 슬라이싱
             self.shape_history.append(self.kv_tmp) # 마지막에 새로운 도형 정보 추가
 
-        self.end_x = max(1, min(event.x, self.task_canvas_width)) # 최종 좌표 제한
+        self.end_x = max(1, min(event.x, self.task_canvas_width))
         self.end_y = max(1, min(event.y, self.task_canvas_height))
+
+        if self.press_shift:  # Shift 키를 누른 경우 정사각형 유지
+            width = abs(self.end_x - self.start_x)
+            height = abs(self.end_y - self.start_y)
+            size = min(width, height)  # 가로, 세로 중 작은 값 선택
+
+            if self.start_x > self.end_x:
+                self.end_x = max(1, self.start_x - size)
+            else:
+                self.end_x = min(self.start_x + size, self.task_canvas_width)
+
+            if self.start_y > self.end_y:
+                self.end_y = max(1, self.start_y - size)
+            else:
+                self.end_y = min(self.start_y + size, self.task_canvas_height)
 
         self.task_canvas.coords(e_id, self.start_x, self.start_y, self.end_x, self.end_y)
         coords = [self.start_x,self.start_y,self.end_x,self.end_y]
