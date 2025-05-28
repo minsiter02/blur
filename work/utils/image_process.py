@@ -4,8 +4,7 @@ import numpy as np
 from work.utils.tools import find_element_idx
 
 class ImageProcess:
-    image = None
-    image_scale = None
+    image = image_scale = None
     img_history = []  # [ [id, image],[id, image], ... , [id, image] ]
     img_history_id = -1
 
@@ -51,6 +50,7 @@ def update_redo_id(redo_id):
     cur_id_pos = find_element_idx(ImageProcess.img_history_id,ImageProcess.img_history) # 현재 id의 위치를 찾고
     ImageProcess.img_history[cur_id_pos][0] = redo_id # 기록에서 해당 위치에 새로운 id 업데이트
     ImageProcess.img_history_id = redo_id # 현재 id를 업데이트
+
 
 def blur(coords, blur_config):
     blur_id, blur_shape, intensity = blur_config
@@ -98,6 +98,7 @@ def blur(coords, blur_config):
     ImageProcess.img_history_id = ImageProcess.img_history[-1][0]
 
     return blur_img
+
 
 def pixel_blur(image, mask):
     """

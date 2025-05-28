@@ -1,11 +1,12 @@
-from tkinter import  Label,Button,Toplevel,Radiobutton,StringVar
+from tkinter import Toplevel,StringVar
+from tkinter.ttk import Label,Button,Radiobutton
 from work.utils.file import save_image
 
 class ImageSettingsWindow(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("이미지 저장 설정")
-        self.geometry("300x100+200+250")
+        self.geometry("400x100+200+250")
         self.resizable(False,False)
         self.grab_set()
         self.qual_var = StringVar(value="high")
