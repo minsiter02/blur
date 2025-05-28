@@ -3,18 +3,20 @@ from work.frames.taskFrame import TaskFrame
 from work.frames.previewFrame import PreviewFrame
 from work.frames.arrowFrame import ArrowFrame
 from work.frames.toolsFrame import ToolsFrame
+from tkinter import ttk
 
 class MainWindow(Tk):
     def __init__(self):
         super().__init__()
-        self.title("test")
+        self.title("Image_Blur")
         self.geometry("800x560+100+100")
         self.resizable(False, False)  # 윈도우 크기 고정
 
         ###################### define frame ######################
-        self.task_frame = TaskFrame(self, main=self)
         self.tools_frame = ToolsFrame(self, main= self)
         self.tools_frame.pack(side="bottom", expand=True, fill="both")
+
+        self.task_frame = TaskFrame(self, main=self)
         self.task_frame.pack(side="left", expand=True, fill="both")
         self.task_frame.pack_propagate(False) # 크기고정
 
@@ -32,11 +34,14 @@ class MainWindow(Tk):
         self.bind("<Tab>", self.on_tap)
         self.bind("<Control-z>", self.on_ctrl_z)
         self.bind("<Control-y>", self.on_ctrl_y)
+        self.bind("<a>", self.on_a)
+        self.bind("<d>", self.on_d)
         ################### END_KEY_EVENT ########################
 
     def update_task_view(self,img):
         img_width = img.width()
         img_height = img.height()
+        self.task_frame.canvas_frame.config(borderwidth=1,relief="solid")
         self.task_frame.task_canvas.config(width=img_width, height=img_height)
         self.task_frame.task_canvas.create_image( img_width/2, img_height/2, image=img)
         self.task_frame.task_canvas.image_names=img
@@ -45,6 +50,7 @@ class MainWindow(Tk):
     def update_preview(self, img):
         img_width = img.width()
         img_height = img.height()
+        self.preview_frame.canvas_frame.config(borderwidth=1,relief="solid")
         self.preview_frame.pre_canvas.config(width=img_width, height=img_height)
         self.preview_frame.pre_canvas.create_image(img_width/2, img_height/2, image=img)
         self.preview_frame.pre_canvas.image_names = img
@@ -55,10 +61,10 @@ class MainWindow(Tk):
     def redo_task(self):
         redo_id = self.task_frame.redo_shape()
         return redo_id
-    def change_blur_settings(self,blur_set):
-        shape, intensity = blur_set
-        self.task_frame.shape = shape
-        self.task_frame.intensity = intensity
+    def change_blur_shape(self,blur_shape):
+        self.task_frame.shape = blur_shape
+    def change_blur_intensity(self,blur_intensity):
+        self.task_frame.intensity = blur_intensity ** 2
 
     ####################### KEY_EVENT_CALLBACK ###############
     def press_shift(self,event):
@@ -73,7 +79,20 @@ class MainWindow(Tk):
         self.tools_frame.on_click_undo_btn()
     def on_ctrl_y(self,event):
         self.tools_frame.on_click_redo_btn()
-
+    def on_a(self,event):
+        i = self.tools_frame.intensity_value.get()
+        if i > 3:
+            self.tools_frame.intensity_value.set(i - 2)
+            self.change_blur_intensity(i)
+    def on_d(self,event):
+        i = self.tools_frame.intensity_value.get()
+        if i < 35:
+            self.tools_frame.intensity_value.set(i + 2)
+            self.change_blur_intensity(i)
 main = MainWindow()
+style = ttk.Style(main)
+main.tk.call('source', 'work/theme/azure.tcl')
+style.theme_use('azure')
+
 main.mainloop()
 

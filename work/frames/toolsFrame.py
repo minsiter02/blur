@@ -1,11 +1,12 @@
-from tkinter import Frame, Button, Scale, Radiobutton, StringVar, IntVar
+from tkinter import Frame, StringVar, IntVar
+from tkinter.ttk import Button, Scale, Radiobutton
 from work.utils.image_process import redo_img,undo_img, update_redo_id
 from work.utils.file import return_resize_tkimg
 class ToolsFrame(Frame):
     def __init__(self, parent, main):
-        super().__init__(parent, height=60,background="gray")
+        super().__init__(parent, height=60)
         self.main = main
-        top_frame = Frame(self,background="gray",pady= 5)
+        top_frame = Frame(self)
         top_frame.pack(side="top")
 
         self.redo_button = Button(top_frame, text="Undo", command=self.on_click_undo_btn)
@@ -21,8 +22,8 @@ class ToolsFrame(Frame):
         self.rdo_rect.pack(side="left", padx=5)
         self.rdo_circle.pack(side="left", padx=5)
 
-        self.intensity_value = IntVar(value=15)
-        self.scale = Scale(self,width=20, length=600, troughcolor="light gray",sliderlength=15 , relief="flat",sliderrelief="flat", variable=self.intensity_value,  orient="horizontal", showvalue=False, from_=3, to = 27, resolution= 2, command=self.change_intensity)
+        self.intensity_value = IntVar(value=19)
+        self.scale = Scale(self, length=600, variable=self.intensity_value, orient="horizontal", from_=3, to = 35, command=self.change_intensity)
         self.scale.pack(side="right", padx=10)
 
     def on_click_undo_btn(self): # 되돌리기 버튼
@@ -42,11 +43,11 @@ class ToolsFrame(Frame):
         update_redo_id(redo_id)
 
     def on_rdo_btn(self):
-        blur_set = [self.radio_var.get(), (self.intensity_value.get()**2)]
-        self.main.change_blur_settings(blur_set)
+        self.main.change_blur_shape(self.radio_var.get())
 
     def change_intensity(self, event):
-        print(event)
-        blur_set = [self.radio_var.get(), (self.intensity_value.get()**2)]
-        self.main.change_blur_settings(blur_set)
+        # ttk 사용시 resolution 옵션이 불가하여 값 강제 조정
+        scale_value = 3 + (round((float(event) - 3) / 2) * 2)
+        self.intensity_value.set(scale_value)
+        self.main.change_blur_intensity(scale_value)
 
