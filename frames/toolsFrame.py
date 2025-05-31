@@ -1,6 +1,6 @@
 from tkinter import Frame, StringVar, IntVar
 from tkinter.ttk import Button, Scale, Radiobutton
-from utils.image_process import redo_img,undo_img, update_redo_id
+from utils.image_process import redo_img,undo_img, update_redo_id, face_blur
 from utils.file import return_resize_tkimg
 class ToolsFrame(Frame):
     def __init__(self, parent, main):
@@ -9,11 +9,13 @@ class ToolsFrame(Frame):
         top_frame = Frame(self)
         top_frame.pack(side="top")
 
-        self.redo_button = Button(top_frame, text="Undo", command=self.on_click_undo_btn)
-        self.undo_button = Button(top_frame, text="Redo", command=self.on_click_redo_btn)
+        self.undo_button = Button(top_frame, text="Undo", command=self.on_click_undo_btn)
+        self.face_button = Button(top_frame, text="auto", command=self.on_click_face_btn)
+        self.redo_button = Button(top_frame, text="Redo", command=self.on_click_redo_btn)
 
-        self.redo_button.pack(side="left", padx=8)
         self.undo_button.pack(side="left", padx=8)
+        self.face_button.pack(side="left", padx=10)
+        self.redo_button.pack(side="left", padx=8)
 
         self.radio_var = StringVar(value="rect")
         self.rdo_rect = Radiobutton(self, text="Rectangle", variable=self.radio_var, value="rect", command=self.on_rdo_btn)
@@ -41,6 +43,14 @@ class ToolsFrame(Frame):
         # 새로운 id를 넘겨줌.
         redo_id = self.main.redo_task()
         update_redo_id(redo_id)
+
+    def on_click_face_btn(self):
+        face_blur_img, id_value = face_blur(intensity=self.intensity_value.get()**2, shape=self.radio_var.get())
+        if face_blur_img is None or id_value is None : return None
+        img = return_resize_tkimg(image=face_blur_img)
+        self.main.update_preview(img=img)
+        self.main.draw_rect_face(id_value=id_value)
+
 
     def on_rdo_btn(self):
         self.main.change_blur_shape(self.radio_var.get())

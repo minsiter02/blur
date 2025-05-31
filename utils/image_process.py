@@ -1,7 +1,8 @@
 import math
+
 import cv2
 import numpy as np
-from utils.tools import find_element_idx
+from utils.tools import find_element_idx,make_fid
 
 class ImageProcess:
     image = image_scale = None
@@ -51,16 +52,38 @@ def update_redo_id(redo_id):
     ImageProcess.img_history[cur_id_pos][0] = redo_id # 기록에서 해당 위치에 새로운 id 업데이트
     ImageProcess.img_history_id = redo_id # 현재 id를 업데이트
 
+def face_blur(intensity,shape):
+    if ImageProcess.image is None: return None, None # 이미지 없으면 수행 안함
+    haar_cascade_file = "utils/haarcascade_frontalface_default.xml"
+    gray_img = cv2.cvtColor(ImageProcess.image, cv2.COLOR_BGR2GRAY)
+    classifier = cv2.CascadeClassifier(haar_cascade_file)
+    faces = classifier.detectMultiScale(gray_img)
+    # faces가 비어 있지 않을 때 (얼굴을 찾았을 때) 만 실행됨 / 이미지 없을 때
+    if len(faces) == 0 : return None, None
+    face_blur_id = make_fid() # 랜덤의 id를 만듦 (얼굴 블러의 경우 접두사 f 를 추가 하여 구분 함)
+    shapes_coords = []
+    for x,y,w,h in faces:
+        coords = [x, y, x+w, y+h]
+        blur(coords,[shape, intensity],face = True)
+        shapes_coords.append([round(c / ImageProcess.image_scale) for c in coords]) # 사각형의 좌표를 추가 (각 요소를 스케일 만큼 나눠 줘야 함) open cv 와 x,y가 다르므로 for 문에서 각각 처리함
 
-def blur(coords, blur_config):
-    blur_id, blur_shape, intensity = blur_config
+    update_history(blur_id= face_blur_id, blur_img=ImageProcess.image)
+    return ImageProcess.image,[face_blur_id,shapes_coords, shape]
+
+def blur(coords, blur_config, face=False):
+    blur_shape, intensity = blur_config
     blur_img = ImageProcess.image.copy() # 참조가 아닌 복사
-    start_x, start_y, end_x, end_y = [int(round(c * ImageProcess.image_scale)) for c in coords]  # scale에 따른 좌표 보정
+
+    if face: # 얼굴 블러는 스케일 조정 필요 없음
+        start_x, start_y, end_x, end_y = coords
+    else:
+        start_x, start_y, end_x, end_y = [int(round(c * ImageProcess.image_scale)) for c in coords]  # scale에 따른 좌표 보정
     roi = blur_img[start_y:end_y, start_x:end_x]  # 관심영역만 가져오기. 행, 열
     roi_size = roi.shape[:2]  # 관심 영역의 너비, 높이 슬라이싱
 
     data = [1 / intensity for _ in range(intensity)]
     blur_mask = np.array(data, np.float32).reshape(int(math.sqrt(intensity)), int(math.sqrt(intensity)))
+
     blur_roi = pixel_blur(roi, blur_mask)
 
     dst = []
@@ -79,26 +102,26 @@ def blur(coords, blur_config):
         foreground = cv2.bitwise_or(blur_roi, blur_roi, mask=fg_pass_mask)
         dst = cv2.add(background, foreground)
 
-    elif blur_shape == "rect":
+    elif blur_shape == "rect" or blur_shape == "face":
         dst = blur_roi
 
     blur_img[start_y:end_y, start_x:end_x] = dst
     ImageProcess.image = blur_img
 
-    img_id_value = [blur_id, blur_img]
-    # 순차적으로 생긴 것 들을 접근하기 위해 리스트로 구현.
-    if ImageProcess.img_history_id == ImageProcess.img_history[-1][0]: #만약 마지막 원소의 id와 현재 이미지 id가 같다면
-        ImageProcess.img_history.append(img_id_value) # 그냥 맨 뒤에 id,이미지 정보 추가
-    else:
-        # redo 기록이 있다면 (마지막 원소가 아니라면) redo 부분까지만 슬라이싱
-        cur_id_pos = find_element_idx(ImageProcess.img_history_id,ImageProcess.img_history)
-        ImageProcess.img_history = ImageProcess.img_history[:cur_id_pos + 1]
-        ImageProcess.img_history.append(img_id_value) # redo 부분 이후로 지우고 거기다가 추가.
-
-    ImageProcess.img_history_id = ImageProcess.img_history[-1][0]
-
     return blur_img
 
+def update_history(blur_id, blur_img):
+    img_id_value = [blur_id, blur_img]
+    # 순차적으로 생긴 것 들을 접근하기 위해 리스트로 구현.
+    if ImageProcess.img_history_id == ImageProcess.img_history[-1][0]:  # 만약 마지막 원소의 id와 현재 이미지 id가 같다면
+        ImageProcess.img_history.append(img_id_value)  # 그냥 맨 뒤에 id,이미지 정보 추가
+    else:
+        # redo 기록이 있다면 (마지막 원소가 아니라면) redo 부분까지만 슬라이싱
+        cur_id_pos = find_element_idx(ImageProcess.img_history_id, ImageProcess.img_history)
+        ImageProcess.img_history = ImageProcess.img_history[:cur_id_pos + 1]
+        ImageProcess.img_history.append(img_id_value)  # redo 부분 이후로 지우고 거기다가 추가.
+
+    ImageProcess.img_history_id = ImageProcess.img_history[-1][0]
 
 def pixel_blur(image, mask):
     """

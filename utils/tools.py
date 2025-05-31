@@ -1,5 +1,5 @@
 import random
-
+import time
 def find_element_idx(element,target_list):
     elements = [e[0] for e in target_list] # 내부 리스트의 첫 요소를 가진 리스트
     element_idx = elements.index(element)
@@ -11,3 +11,6 @@ def blur_to_color(intensity):
     r,g,b = [random.randint(150,255)-round(norm_intensity*150) for _ in range(3)]
     return f'#{r:02x}{g:02x}{b:02x}'
 
+def make_fid():
+    random_value_str =str(int(time.time() * random.randint(1, 1000)))
+    return "f" + random_value_str
